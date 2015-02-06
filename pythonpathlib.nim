@@ -5,7 +5,77 @@
 # Released under the MIT open source license.
 
 
-
+## pythonpathlib is a Nim module that provides an interface for working with paths that 
+## is as similar as possible to Python's ``pathlib`` module.
+##
+## Examples:
+##
+## .. code-block:: nimrod
+##    
+##    # Create two paths, check if they are equal, and append another directory to the first path.
+##    var path1 : PythonPath = Path("/home/adam/")
+##    var path2 : PythonPath = Path("/home/user")
+##    echo(path1 == path2) # false
+##    path1 = path1 / "nim" / "pythonpathlib"
+##    echo(path1) # "/home/adam/nim/pythonpathlib"
+##
+## .. code-block:: nimrod
+##    
+##    # Create a path and output the parent directories of the path.
+##    var path : PythonPath = Path("/home/adam/nim/pythonpathlib/pythonpathlib.nim")
+##    var parents : seq[string] = path.parents
+##    for i in parents:
+##        echo(i)
+##    # output:
+##    # "/"
+##    # "home"
+##    # "adam"
+##    # "nim"
+##    # "pythonpathlib"
+##
+## .. code-block:: nimrod
+##    
+##    # Create a path, get the name and suffix, and then change both.
+##    var path : PythonPath = Path("code/example.nim")
+##    echo(path.name) # "example.nim"
+##    echo(path.suffix) # ".nim"
+##    path = path.with_name("newfile.nim")
+##    echo(path) # "code/newfile.nim"
+##    path = path.with_suffix(".py")
+##    echo(path) # "code/newfile.py"
+##
+## .. code-block:: nimrod
+##    
+##    # Create a path, check whether the path exists, and then see whether it is a file, directory, or symlink.
+##    var path : PythonPath = Path("/home/adam")
+##    echo(path.exists()) # true
+##    echo(path.is_file()) # false
+##    echo(path.is_dir()) # true
+##    echo(path.is_symlink()) # false
+##
+## .. code-block:: nimrod
+##    
+##    # Create a path, rename the path it represents to something else, and then force another rename.
+##    var path : PythonPath = Path("code/example.nim")
+##    path.rename("code/newexample.nim")
+##    # path.rename(Path("code/newexample.nim")) also works
+##    path.replace("code/testing.nim")
+##    # if "code/testing.nim" already existed, if would be overritten by the last method.
+##
+## .. code-block:: nimrod
+##    
+##    # Create a path and get its representation as a file URI.
+##    var path : PythonPath = Path("/home/adam/nim/code.nim")
+##    var fileURI : string = path.as_uri()
+##    echo(fileURI) # "file:///home/adam/nim/code.nim"
+##
+## .. code-block:: nimrod
+##    
+##    # Create a path and compute a version of this path relative to another.
+##    var path : PythonPath = Path("/home/adam/nim/code.nim")
+##    echo(path.relative_to("home")) # "adam/nim/code.nim"
+##    echo(path.relative_to("nim")) # "code.nim"
+##    echo(path.relative_to("usr")) # can't do, not on path
 
 
 import os
@@ -48,11 +118,17 @@ proc `!=`*(path1 : PythonPath, path2 : PythonPath): bool =
 proc `/`*(path1 : PythonPath, path2 : string): PythonPath = 
     ## Join operator for PythonPath.
     
+    if path1.p.endsWith("/"):
+        path1.p = path1.p[0..high(path1.p) - 1]
+    
     return Path(path1.p & "/" & path2)
 
 
 proc `/`*(path1 : PythonPath, path2 : PythonPath): PythonPath = 
     ## Join operator for PythonPath.
+    
+    if path1.p.endsWith("/"):
+        path1.p = path1.p[0..high(path1.p) - 1]
     
     return Path(path1.p & "/" & path2.p)
 
@@ -365,3 +441,4 @@ proc rmdir*(path : PythonPath) {.noreturn.} =
     ## Removes the directory specified by the path. 
     
     removeDir(path.p)
+
