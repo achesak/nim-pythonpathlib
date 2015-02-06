@@ -1,0 +1,8 @@
+---- About ----
+
+nim-pythonpathlib is a Nim module that provides an interface for working with paths that is as similar as possible to Python's pathlib module.
+See the documentation.html file for usage and more info.
+
+---- License ----
+
+nim-pythonpathlib is released under the MIT open source license.
