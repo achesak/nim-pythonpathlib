@@ -1170,6 +1170,16 @@ dt pre > span.Operator ~ span.Identifier, dt pre > span.Operator ~ span.Operator
   <ul class="simple simple-toc-section">
       <li><a class="reference" href="#Path,string"
     title="Path*(p: string): PythonPath"><wbr />Path</a></li>
+  <li><a class="reference" href="#PosixPath,string"
+    title="PosixPath*(p: string): PythonPath"><wbr />Posix<wbr />Path</a></li>
+  <li><a class="reference" href="#WindowsPath,string"
+    title="WindowsPath*(p: string): PythonPath"><wbr />Windows<wbr />Path</a></li>
+  <li><a class="reference" href="#PurePath,string"
+    title="PurePath*(p: string): PythonPath"><wbr />Pure<wbr />Path</a></li>
+  <li><a class="reference" href="#PurePosixPath,string"
+    title="PurePosixPath*(p: string): PythonPath"><wbr />Pure<wbr />Posix<wbr />Path</a></li>
+  <li><a class="reference" href="#PureWindowsPath,string"
+    title="PureWindowsPath*(p: string): PythonPath"><wbr />Pure<wbr />Windows<wbr />Path</a></li>
   <li><a class="reference" href="#$,PythonPath"
     title="`$`*(path: PythonPath): string">`<wbr />$`</a></li>
   <li><a class="reference" href="#==,PythonPath,PythonPath"
@@ -1320,6 +1330,31 @@ dt pre > span.Operator ~ span.Identifier, dt pre > span.Operator ~ span.Operator
 <dt id="Path"><a name="Path,string"></a><pre><span class="Keyword">proc</span> <span class="Identifier">Path</span><span class="Operator">*</span><span class="Other">(</span><span class="Identifier">p</span><span class="Other">:</span> <span class="Identifier">string</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">PythonPath</span></pre></dt>
 <dd>
 Creates a new PythonPath representing the specified file or directory.
+
+</dd>
+<dt id="PosixPath"><a name="PosixPath,string"></a><pre><span class="Keyword">proc</span> <span class="Identifier">PosixPath</span><span class="Operator">*</span><span class="Other">(</span><span class="Identifier">p</span><span class="Other">:</span> <span class="Identifier">string</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">PythonPath</span></pre></dt>
+<dd>
+
+
+</dd>
+<dt id="WindowsPath"><a name="WindowsPath,string"></a><pre><span class="Keyword">proc</span> <span class="Identifier">WindowsPath</span><span class="Operator">*</span><span class="Other">(</span><span class="Identifier">p</span><span class="Other">:</span> <span class="Identifier">string</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">PythonPath</span></pre></dt>
+<dd>
+
+
+</dd>
+<dt id="PurePath"><a name="PurePath,string"></a><pre><span class="Keyword">proc</span> <span class="Identifier">PurePath</span><span class="Operator">*</span><span class="Other">(</span><span class="Identifier">p</span><span class="Other">:</span> <span class="Identifier">string</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">PythonPath</span></pre></dt>
+<dd>
+
+
+</dd>
+<dt id="PurePosixPath"><a name="PurePosixPath,string"></a><pre><span class="Keyword">proc</span> <span class="Identifier">PurePosixPath</span><span class="Operator">*</span><span class="Other">(</span><span class="Identifier">p</span><span class="Other">:</span> <span class="Identifier">string</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">PythonPath</span></pre></dt>
+<dd>
+
+
+</dd>
+<dt id="PureWindowsPath"><a name="PureWindowsPath,string"></a><pre><span class="Keyword">proc</span> <span class="Identifier">PureWindowsPath</span><span class="Operator">*</span><span class="Other">(</span><span class="Identifier">p</span><span class="Other">:</span> <span class="Identifier">string</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">PythonPath</span></pre></dt>
+<dd>
+
 
 </dd>
 <dt id="$"><a name="$,PythonPath"></a><pre><span class="Keyword">proc</span> <span class="Other">`</span><span class="Operator">$</span><span class="Other">`</span><span class="Operator">*</span><span class="Other">(</span><span class="Identifier">path</span><span class="Other">:</span> <span class="Identifier">PythonPath</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">string</span></pre></dt>
@@ -1512,7 +1547,7 @@ Removes the directory specified by the path.
       <div class="twelve-columns footer">
         <span class="nim-sprite"></span>
         <br>
-        <small>Made with Nim. Generated: 2015-02-06 17:39:35 UTC</small>
+        <small>Made with Nim. Generated: 2015-02-07 12:29:11 UTC</small>
       </div>
     </div>
   </div>

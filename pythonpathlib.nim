@@ -97,6 +97,26 @@ proc Path*(p : string): PythonPath =
     return pypath
 
 
+proc PosixPath*(p : string): PythonPath = 
+    return Path(p)
+
+
+proc WindowsPath*(p : string): PythonPath = 
+    return Path(p)
+
+
+proc PurePath*(p : string): PythonPath = 
+    return Path(p)
+
+
+proc PurePosixPath*(p : string): PythonPath = 
+    return Path(p)
+
+
+proc PureWindowsPath*(p : string): PythonPath = 
+    return Path(p)
+
+
 proc `$`*(path : PythonPath): string = 
     ## String operator for PythonPath.
     
