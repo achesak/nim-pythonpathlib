@@ -6,4 +6,4 @@ description = "Module for working with paths that is as similar as possible to P
 license = "MIT"
 
 [Deps]
-Requires: "nimrod >= 0.10.2"
+Requires: "nim >= 0.11"
