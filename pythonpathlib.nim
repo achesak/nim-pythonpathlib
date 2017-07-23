@@ -193,7 +193,7 @@ proc parents*(path : PythonPath): seq[PythonPath] =
     ## Returns a sequence providing access to the logical ancestors of the path.
     
     var part : seq[string] = newSeq[string](0)
-    var (dir, name, ext) = splitFile(path.p)
+    var dir = splitFile(path.p)[0]
     
     while dir.contains("/"):
         var (d1, d2) = splitPath(dir)
@@ -215,7 +215,7 @@ proc parent*(path : PythonPath): PythonPath =
     if path.p == "/" or path.p == "." or path.p == "..":
         return Path(path.p)
     
-    var (p1, p2) = splitPath(path.p)
+    var p1 = splitPath(path.p)[0]
     if p1 == "":
         p1 = "/"
     
@@ -225,7 +225,9 @@ proc parent*(path : PythonPath): PythonPath =
 proc name*(path : PythonPath): string = 
     ## Returns a string representing the final path component, excluding the drive and root, if any.
     
-    var (dir, name, ext) = splitFile(path.p)
+    var splitPath = splitFile(path.p)
+    var name = splitPath[1]
+    var ext = splitPath[2]
     
     if name == "":
         return ""
@@ -237,37 +239,36 @@ proc name*(path : PythonPath): string =
 proc suffix*(path : PythonPath): string = 
     ## Returns the file extension of the final component, if any.
     
-    var (dir, name, ext) = splitFile(path.p)
-    return ext
+    return splitFile(path.p)[2]
 
 
 proc suffixes*(path : PythonPath): seq[string] = 
-     ## Returns a sequence of the path’s file extensions, if any.
+    ## Returns a sequence of the path’s file extensions, if any.
+    
+    var part : seq[string] = newSeq[string](0)
+    var splitPath = splitFile(path.p)
+    var name = splitPath[1]
+    var ext = splitPath[2]
      
-     var part : seq[string] = newSeq[string](0)
-     var (dir, name, ext) = splitFile(path.p)
-     
-     if ext == "":
-         return part
-     
-     part.add(ext)
-     while ext != "":
-         var n : string = name
-         name = splitFile(n)[1]
-         ext = splitFile(n)[2]
-         if ext != "":
-             part.add(ext)
-     part.reverse()
-     
-     return part
+    if ext == "":
+        return part
+    
+    part.add(ext)
+    while ext != "":
+        var n : string = name
+        name = splitFile(n)[1]
+        ext = splitFile(n)[2]
+        if ext != "":
+            part.add(ext)
+    part.reverse()
+    
+    return part
 
 
 proc stem*(path : PythonPath): string = 
     ## Returns the final path component, without its suffix.
     
-    var (dir, name, ext) = splitFile(path.p)
-    
-    return name
+    return splitFile(path.p)[1]
 
 
 proc as_posix*(path : PythonPath): string = 
@@ -336,7 +337,9 @@ proc relative_to*(path : PythonPath, other : PythonPath): PythonPath =
 proc with_name*(path : PythonPath, newName : string): PythonPath = 
     ## Returns a new path with the name changed.
     
-    var (dir, name, ext) = splitFile(path.p)
+    var splitPath = splitFile(path.p)
+    var dir = splitPath[0]
+    var name = splitPath[1]
     
     doAssert(name != "", "with_name(): no name to change")
     
@@ -350,7 +353,9 @@ proc with_name*(path : PythonPath, newName : string): PythonPath =
 proc with_suffix*(path : PythonPath, newSuffix : string): PythonPath = 
     ## Returns a new path with the suffix changed.
     
-    var (dir, name, ext) = splitFile(path.p)
+    var splitPath = splitFile(path.p)
+    var dir = splitPath[0]
+    var name = splitPath[1]
     
     var n : string = ""
     if dir != "":
