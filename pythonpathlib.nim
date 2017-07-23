@@ -84,9 +84,7 @@ import algorithm
 
 
 type
-    PythonPath* = ref PythonPathInternal
-    
-    PythonPathInternal* = object
+    PythonPath* = ref object
         p* : string
 
 
@@ -179,7 +177,7 @@ proc drive*(path : PythonPath): string =
     
     var info : FileInfo = getFileInfo(open(path.p))
     
-    return intToStr(info.id.device)
+    return intToStr(int(info.id.device))
 
 
 proc root*(path : PythonPath): string = 
