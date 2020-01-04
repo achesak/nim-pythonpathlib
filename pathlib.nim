@@ -399,7 +399,7 @@ proc stat*(path : NimPath): FileInfo =
     return getFileInfo(open(path.p))
 
 
-proc chmod*(path : NimPath, mode : set[FilePermission]) {.noreturn.} = 
+proc chmod*(path : NimPath, mode : set[FilePermission]) = 
     ## Changes the file permissions.
     
     path.p.setFilePermissions(mode)
@@ -447,47 +447,47 @@ proc open*(path : NimPath, mode : string = "r", buffering : int = -1): File =
     return open(path.p, m, buffering)
 
 
-proc rename*(path1 : NimPath, path2 : string) {.noreturn.} = 
+proc rename*(path1 : NimPath, path2 : string) = 
     ## Renames the path to the given new path. Updates the first path to point to the new path.
     
     path1.p.moveFile(path2)
     path1.p = path2
 
 
-proc rename*(path1 : NimPath, path2 : NimPath) {.noreturn.} = 
+proc rename*(path1 : NimPath, path2 : NimPath) = 
     ## Renames the path to the given new path. Updates the first path to point to the new path.
     
     path1.p.moveFile(path2.p)
     path1.p = path2.p
 
 
-proc replace*(path1 : NimPath, path2 : string) {.noreturn.} = 
+proc replace*(path1 : NimPath, path2 : string) = 
     ## Renames this file or directory to the given target. If target points to an existing file or directory, it will be unconditionally replaced.
     
     removeDir(path2)
     path1.rename(path2)
 
 
-proc replace*(path1 : NimPath, path2 : NimPath) {.noreturn.} = 
+proc replace*(path1 : NimPath, path2 : NimPath) = 
     ## Renames this file or directory to the given target. If target points to an existing file or directory, it will be unconditionally replaced.
     
     removeDir(path2.p)
     path1.rename(path2)
 
 
-proc mkdir*(path : NimPath) {.noreturn.} = 
+proc mkdir*(path : NimPath) = 
     ## Creates a new directory with the name of the path.
     
     createDir(path.p)
 
 
-proc resolve*(path : NimPath) {.noreturn.} = 
+proc resolve*(path : NimPath) = 
     ## Sets the path to the full name of the path.
     
     path.p = expandFilename(path.p)
 
 
-proc rmdir*(path : NimPath) {.noreturn.} = 
+proc rmdir*(path : NimPath) = 
     ## Removes the directory specified by the path. 
     
     removeDir(path.p)
