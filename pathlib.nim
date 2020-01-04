@@ -79,6 +79,7 @@
 
 
 import os
+import times
 import strutils
 import algorithm
 
@@ -497,6 +498,23 @@ proc rmdir*(path : NimPath) =
     ## Removes the directory specified by the path. 
     
     removeDir(path.p)
+
+
+proc touch*(path : NimPath, mode: set[FilePermission] = {fpUserRead, fpUserWrite, fpGroupRead, fpGroupWrite, fpOthersRead, fpOthersWrite}, exists_ok=true) =
+    ## Create a file at the given path.
+    ## If mode is given, it is applied to the file (otherwise full read/write access is set)
+    ## If the file already exists, the function succeeds if exist_ok is true (which is the default).
+    ## In this case the file modification time will be  updated to the current time.
+    ## If the file already exists but exists_ok is set to false, an OSError exception is raised.
+
+    if path.exists():
+        if exists_ok:
+            setLastModificationTime(path.p, now().toTime())
+            return
+        else:
+            raise newException(OSError, "file '" & $path & "' already exists")
+    close(path.open(mode="wb"))
+    path.chmod(mode=mode)
 
 
 proc unlink*(path : NimPath, missing_ok=false) =
