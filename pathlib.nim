@@ -145,7 +145,10 @@ proc `/`*(path1 : NimPath, path2 : NimPath): NimPath =
 
     if path1.p.endsWith(sep):
         path1.p = path1.p[0..high(path1.p) - 1]
-    
+
+    if path2.p.startsWith(sep):
+        path2.p = path2.p[1..high(path2.p)]
+
     return Path(path1.p & sep & path2.p)
 
 
