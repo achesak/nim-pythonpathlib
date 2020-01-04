@@ -306,6 +306,15 @@ proc as_uri*(path : NimPath): string =
     return "file://" & path.p
 
 
+proc is_absolute*(path : NimPath): bool = 
+    ## Returns true if the path is absolute.
+    ## A path is considered absolute if it has both a root and (if the flavour allows) a drive.
+    when defined(windows):
+        return path.root.len > 0 and path.drive.len > 0
+    else:
+        return path.root.len > 0
+
+
 proc is_reserved*(path : NimPath): bool = 
     ## Returns true if the path is considered reserved under Windows, and false otherwise.
     
