@@ -164,6 +164,22 @@ proc `/`*(path1 : NimPath, path2 : NimPath): NimPath =
     return Path(path1.p & sep & path2.p)
 
 
+proc `/`*(path1 : string, path2 : NimPath): NimPath = 
+    ## Join operator for NimPath.
+    
+    let sep =
+        if '\\' in path1: "\\"
+        elif '/' in path1: "/"
+        elif '\\' in path2.p: "\\"
+        else: $DirSep
+
+    var outpath = path1
+    if outpath.endsWith(sep):
+        outpath = outpath[0..high(outpath) - 1]
+    
+    return Path(outpath & sep & path2.p)
+
+
 proc parts*(path : NimPath): seq[string] = 
     ## Returns a seq giving access to the path’s various components.
     
