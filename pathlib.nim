@@ -5,7 +5,7 @@
 # Released under the MIT open source license.
 
 
-## pythonpathlib is a Nim module that provides an interface for working with paths that 
+## Pathlib is a Nim module that provides an interface for working with paths that 
 ## is as similar as possible to Python's ``pathlib`` module.
 ##
 ## Examples:
@@ -13,16 +13,16 @@
 ## .. code-block:: nimrod
 ##    
 ##    # Create two paths, check if they are equal, and append another directory to the first path.
-##    var path1 : PythonPath = Path("/home/adam/")
-##    var path2 : PythonPath = Path("/home/user")
+##    var path1 : NimPath = Path("/home/adam/")
+##    var path2 : NimPath = Path("/home/user")
 ##    echo(path1 == path2) # false
-##    path1 = path1 / "nim" / "pythonpathlib"
-##    echo(path1) # "/home/adam/nim/pythonpathlib"
+##    path1 = path1 / "nim" / "NimPathlib"
+##    echo(path1) # "/home/adam/nim/NimPathlib"
 ##
 ## .. code-block:: nimrod
 ##    
 ##    # Create a path and output the parent directories of the path.
-##    var path : PythonPath = Path("/home/adam/nim/pythonpathlib/pythonpathlib.nim")
+##    var path : NimPath = Path("/home/adam/nim/NimPathlib/NimPathlib.nim")
 ##    var parents : seq[string] = path.parents
 ##    for i in parents:
 ##        echo(i)
@@ -31,12 +31,12 @@
 ##    # "home"
 ##    # "adam"
 ##    # "nim"
-##    # "pythonpathlib"
+##    # "NimPathlib"
 ##
 ## .. code-block:: nimrod
 ##    
 ##    # Create a path, get the name and suffix, and then change both.
-##    var path : PythonPath = Path("code/example.nim")
+##    var path : NimPath = Path("code/example.nim")
 ##    echo(path.name) # "example.nim"
 ##    echo(path.suffix) # ".nim"
 ##    path = path.with_name("newfile.nim")
@@ -47,7 +47,7 @@
 ## .. code-block:: nimrod
 ##    
 ##    # Create a path, check whether the path exists, and then see whether it is a file, directory, or symlink.
-##    var path : PythonPath = Path("/home/adam")
+##    var path : NimPath = Path("/home/adam")
 ##    echo(path.exists()) # true
 ##    echo(path.is_file()) # false
 ##    echo(path.is_dir()) # true
@@ -56,7 +56,7 @@
 ## .. code-block:: nimrod
 ##    
 ##    # Create a path, rename the path it represents to something else, and then force another rename.
-##    var path : PythonPath = Path("code/example.nim")
+##    var path : NimPath = Path("code/example.nim")
 ##    path.rename("code/newexample.nim")
 ##    # path.rename(Path("code/newexample.nim")) also works
 ##    path.replace("code/testing.nim")
@@ -65,93 +65,106 @@
 ## .. code-block:: nimrod
 ##    
 ##    # Create a path and get its representation as a file URI.
-##    var path : PythonPath = Path("/home/adam/nim/code.nim")
+##    var path : NimPath = Path("/home/adam/nim/code.nim")
 ##    var fileURI : string = path.as_uri()
 ##    echo(fileURI) # "file:///home/adam/nim/code.nim"
 ##
 ## .. code-block:: nimrod
 ##    
 ##    # Create a path and compute a version of this path relative to another.
-##    var path : PythonPath = Path("/home/adam/nim/code.nim")
+##    var path : NimPath = Path("/home/adam/nim/code.nim")
 ##    echo(path.relative_to("home")) # "adam/nim/code.nim"
 ##    echo(path.relative_to("nim")) # "code.nim"
 ##    echo(path.relative_to("usr")) # can't do, not on path
 
 
 import os
+import times
 import strutils
 import algorithm
 
 
 type
-    PythonPath* = ref object
+    NimPath* = ref object
         p* : string
 
 
-proc Path*(p : string): PythonPath = 
-    ## Creates a new PythonPath representing the specified file or directory.
+proc Path*(p : string): NimPath = 
+    ## Creates a new NimPath representing the specified file or directory.
     
-    var pypath : PythonPath = PythonPath(p: p)
+    var pypath : NimPath = NimPath(p: p)
     return pypath
 
 
-proc PosixPath*(p : string): PythonPath = 
+proc PosixPath*(p : string): NimPath = 
     return Path(p)
 
 
-proc WindowsPath*(p : string): PythonPath = 
+proc WindowsPath*(p : string): NimPath = 
     return Path(p)
 
 
-proc PurePath*(p : string): PythonPath = 
+proc PurePath*(p : string): NimPath = 
     return Path(p)
 
 
-proc PurePosixPath*(p : string): PythonPath = 
+proc PurePosixPath*(p : string): NimPath = 
     return Path(p)
 
 
-proc PureWindowsPath*(p : string): PythonPath = 
+proc PureWindowsPath*(p : string): NimPath = 
     return Path(p)
 
 
-proc `$`*(path : PythonPath): string = 
-    ## String operator for PythonPath.
+proc `$`*(path : NimPath): string = 
+    ## String operator for NimPath.
     
     return path.p
 
 
-proc `==`*(path1 : PythonPath, path2 : PythonPath): bool =
-    ## Equality operator for PythonPath.
+proc `==`*(path1 : NimPath, path2 : NimPath): bool =
+    ## Equality operator for NimPath.
     
     return path1.p == path2.p
 
 
-proc `!=`*(path1 : PythonPath, path2 : PythonPath): bool = 
-    ## Inequality operator for PythonPath.
+proc `!=`*(path1 : NimPath, path2 : NimPath): bool = 
+    ## Inequality operator for NimPath.
     
     return path1.p != path2.p
 
 
-proc `/`*(path1 : PythonPath, path2 : string): PythonPath = 
-    ## Join operator for PythonPath.
-    
-    if path1.p.endsWith("/"):
+proc `/`*(path1 : NimPath, path2 : NimPath): NimPath = 
+    ## Join operator for NimPath.
+
+    let sep =
+        if '\\' in path1.p: "\\"
+        elif '/' in path1.p: "/"
+        elif '\\' in path2.p: "\\"
+        else: $DirSep
+
+    if path1.p.endsWith(sep):
         path1.p = path1.p[0..high(path1.p) - 1]
-    
-    return Path(path1.p & "/" & path2)
+
+    if path2.p.startsWith(sep):
+        path2.p = path2.p[1..high(path2.p)]
+
+    return Path(path1.p & sep & path2.p)
 
 
-proc `/`*(path1 : PythonPath, path2 : PythonPath): PythonPath = 
-    ## Join operator for PythonPath.
-    
-    if path1.p.endsWith("/"):
-        path1.p = path1.p[0..high(path1.p) - 1]
-    
-    return Path(path1.p & "/" & path2.p)
+proc `/`*(path1 : NimPath, path2 : string): NimPath = 
+    ## Join operator for NimPath.
+
+    return path1 / Path(path2)
 
 
-proc parts*(path : PythonPath): seq[string] = 
+proc `/`*(path1 : string, path2 : NimPath): NimPath = 
+    ## Join operator for NimPath.
+
+    return Path(path1) / path2
+
+
+proc parts*(path : NimPath): seq[string] = 
     ## Returns a seq giving access to the path’s various components.
     
     var part : seq[string] = newSeq[string](0)
@@ -172,24 +185,42 @@ proc parts*(path : PythonPath): seq[string] =
     return part
 
 
-proc drive*(path : PythonPath): string = 
+proc drive*(path : NimPath): string = 
     ## Returns a string representing the drive letter or name, if any.
-    
-    var info : FileInfo = getFileInfo(open(path.p))
-    
-    return intToStr(int(info.id.device))
+
+    if len(path.p) >= 2:
+        if path.p[1] == ':':
+            return path.p[0..1]
+        #elif len(path.p) >= 5:
+        if path.p[0..1] == "\\\\" or path.p[0..1] == "//":
+            let sep = path.p[0..0]
+            let parts = path.p[2..^1].split(sep, maxsplit=3)
+            if len(parts) >= 2:
+                return "\\\\" & parts[0..1].join("\\")
+    return ""
 
 
-proc root*(path : PythonPath): string = 
+proc root*(path : NimPath): string = 
     ## Returns a string representing the root directory, if any.
-    
-    if defined(windows):
-        return "c:"
-    else:
-        return "/"
+
+    let osRoot = if defined(windows): "\\" else: "/"
+
+    if len(path.p) >= 3:
+        if path.p[1..2] == ":/" or path.p[1..2] == ":\\":
+            return osRoot
+    if len(path.p) >= 1:
+        if path.p[0] == '/' or path.p[0] == '\\':
+            return osRoot
+    return ""
 
 
-proc parents*(path : PythonPath): seq[PythonPath] = 
+proc anchor*(path : NimPath): string = 
+    ## Returns a string representing the concatenation of the drive and root, if any.
+
+    return path.drive & path.root
+
+
+proc parents*(path : NimPath): seq[NimPath] = 
     ## Returns a sequence providing access to the logical ancestors of the path.
     
     var part : seq[string] = newSeq[string](0)
@@ -202,14 +233,14 @@ proc parents*(path : PythonPath): seq[PythonPath] =
     part.add("/")
     part.reverse()
     
-    var part2 : seq[PythonPath] = newSeq[PythonPath](len(part))
+    var part2 : seq[NimPath] = newSeq[NimPath](len(part))
     for i in 0..high(part):
         part2[i] = Path(part[i])
     
     return part2
 
 
-proc parent*(path : PythonPath): PythonPath = 
+proc parent*(path : NimPath): NimPath = 
     ## Returns the logical parent of the path.
     
     if path.p == "/" or path.p == "." or path.p == "..":
@@ -222,7 +253,7 @@ proc parent*(path : PythonPath): PythonPath =
     return Path(p1)
 
 
-proc name*(path : PythonPath): string = 
+proc name*(path : NimPath): string = 
     ## Returns a string representing the final path component, excluding the drive and root, if any.
     
     var splitPath = splitFile(path.p)
@@ -236,13 +267,13 @@ proc name*(path : PythonPath): string =
     return name
 
 
-proc suffix*(path : PythonPath): string = 
+proc suffix*(path : NimPath): string = 
     ## Returns the file extension of the final component, if any.
     
     return splitFile(path.p)[2]
 
 
-proc suffixes*(path : PythonPath): seq[string] = 
+proc suffixes*(path : NimPath): seq[string] = 
     ## Returns a sequence of the path’s file extensions, if any.
     
     var part : seq[string] = newSeq[string](0)
@@ -265,13 +296,13 @@ proc suffixes*(path : PythonPath): seq[string] =
     return part
 
 
-proc stem*(path : PythonPath): string = 
+proc stem*(path : NimPath): string = 
     ## Returns the final path component, without its suffix.
     
     return splitFile(path.p)[1]
 
 
-proc as_posix*(path : PythonPath): string = 
+proc as_posix*(path : NimPath): string = 
     ## Returns a string representation of the path with forward slashes (/).
     
     if not defined(windows):
@@ -280,7 +311,7 @@ proc as_posix*(path : PythonPath): string =
     return path.p.replace("\\", "/") # not perfect...
 
 
-proc as_uri*(path : PythonPath): string = 
+proc as_uri*(path : NimPath): string = 
     ## Returns the path as a file URI. Will fail if the path is not absolute.
     
     doAssert(path.p.isAbsolute(), "as_uri(): path must be absolute")
@@ -288,14 +319,23 @@ proc as_uri*(path : PythonPath): string =
     return "file://" & path.p
 
 
-proc is_reserved*(path : PythonPath): bool = 
+proc is_absolute*(path : NimPath): bool = 
+    ## Returns true if the path is absolute.
+    ## A path is considered absolute if it has both a root and (if the flavour allows) a drive.
+    when defined(windows):
+        return path.root.len > 0 and path.drive.len > 0
+    else:
+        return path.root.len > 0
+
+
+proc is_reserved*(path : NimPath): bool = 
     ## Returns true if the path is considered reserved under Windows, and false otherwise.
     
     return false
 
 
-proc joinpath*(paths : varargs[PythonPath]): PythonPath = 
-    ## Joins the paths and returns a new PythonPath representing the joined paths.
+proc joinpath*(paths : varargs[NimPath]): NimPath = 
+    ## Joins the paths and returns a new NimPath representing the joined paths.
     
     var p : seq[string] = newSeq[string](0)
     for i in paths:
@@ -308,10 +348,10 @@ proc joinpath*(paths : varargs[PythonPath]): PythonPath =
     return Path(newPath)
 
 
-proc relative_to*(path : PythonPath, other : string): PythonPath = 
+proc relative_to*(path : NimPath, other : string): NimPath = 
     ## Returns a new path of this path relative to the path represented by other.
     
-    var parents : seq[PythonPath] = path.parents()
+    var parents : seq[NimPath] = path.parents()
     
     var pIndex : int = -1
     for i in 0..high(parents):
@@ -328,13 +368,13 @@ proc relative_to*(path : PythonPath, other : string): PythonPath =
     return Path(pStr)
 
 
-proc relative_to*(path : PythonPath, other : PythonPath): PythonPath = 
+proc relative_to*(path : NimPath, other : NimPath): NimPath = 
     ## Returns a new path of this path relative to the path represented by other.
     
     return path.relative_to(other.p)
 
 
-proc with_name*(path : PythonPath, newName : string): PythonPath = 
+proc with_name*(path : NimPath, newName : string): NimPath = 
     ## Returns a new path with the name changed.
     
     var splitPath = splitFile(path.p)
@@ -350,7 +390,7 @@ proc with_name*(path : PythonPath, newName : string): PythonPath =
     return Path(n & newName)
 
 
-proc with_suffix*(path : PythonPath, newSuffix : string): PythonPath = 
+proc with_suffix*(path : NimPath, newSuffix : string): NimPath = 
     ## Returns a new path with the suffix changed.
     
     var splitPath = splitFile(path.p)
@@ -366,43 +406,49 @@ proc with_suffix*(path : PythonPath, newSuffix : string): PythonPath =
     return Path(n & name & newSuffix)
 
 
-proc stat*(path : PythonPath): FileInfo = 
+proc stat*(path : NimPath): FileInfo = 
     ## Returns information about this path.
     
     return getFileInfo(open(path.p))
 
 
-proc chmod*(path : PythonPath, mode : set[FilePermission]) {.noreturn.} = 
+proc chmod*(path : NimPath, mode : set[FilePermission]) = 
     ## Changes the file permissions.
     
     path.p.setFilePermissions(mode)
 
 
-proc exists*(path : PythonPath): bool = 
+proc exists*(path : NimPath): bool = 
     ## Returns true if the path points to an existing directory or file, and false otherwise.
     
     return existsFile(path.p) or existsDir(path.p)
 
 
-proc is_dir*(path : PythonPath): bool = 
+proc expanduser*(path: NimPath): NimPath =
+    ## Return a new path with expanded ~ and ~user constructs, as returned by os.expandTilde():
+
+    return Path(expandTilde(path.p))
+
+
+proc is_dir*(path : NimPath): bool = 
     ## Returns true if the path points to an existing directory, and false otherwise.
     
     return existsDir(path.p)
 
 
-proc is_file*(path : PythonPath): bool = 
+proc is_file*(path : NimPath): bool = 
     ## Returns true if the path points to an existing file, and false otherwise.
     
     return existsFile(path.p)
 
 
-proc is_symlink*(path : PythonPath): bool = 
+proc is_symlink*(path : NimPath): bool = 
     ## Returns true if the path points to an existing symlink, and false otherwise.
     
     return symlinkExists(path.p)
 
 
-proc open*(path : PythonPath, mode : string = "r", buffering : int = -1): File = 
+proc open*(path : NimPath, mode : string = "r", buffering : int = -1): File = 
     ## Opens the file that the path represents.
     
     var m : FileMode = fmRead
@@ -420,48 +466,81 @@ proc open*(path : PythonPath, mode : string = "r", buffering : int = -1): File =
     return open(path.p, m, buffering)
 
 
-proc rename*(path1 : PythonPath, path2 : string) {.noreturn.} = 
+proc rename*(path1 : NimPath, path2 : string) = 
     ## Renames the path to the given new path. Updates the first path to point to the new path.
     
     path1.p.moveFile(path2)
     path1.p = path2
 
 
-proc rename*(path1 : PythonPath, path2 : PythonPath) {.noreturn.} = 
+proc rename*(path1 : NimPath, path2 : NimPath) = 
     ## Renames the path to the given new path. Updates the first path to point to the new path.
     
     path1.p.moveFile(path2.p)
     path1.p = path2.p
 
 
-proc replace*(path1 : PythonPath, path2 : string) {.noreturn.} = 
+proc replace*(path1 : NimPath, path2 : string) = 
     ## Renames this file or directory to the given target. If target points to an existing file or directory, it will be unconditionally replaced.
     
     removeDir(path2)
     path1.rename(path2)
 
 
-proc replace*(path1 : PythonPath, path2 : PythonPath) {.noreturn.} = 
+proc replace*(path1 : NimPath, path2 : NimPath) = 
     ## Renames this file or directory to the given target. If target points to an existing file or directory, it will be unconditionally replaced.
     
     removeDir(path2.p)
     path1.rename(path2)
 
 
-proc mkdir*(path : PythonPath) {.noreturn.} = 
+proc mkdir*(path : NimPath) = 
     ## Creates a new directory with the name of the path.
     
     createDir(path.p)
 
 
-proc resolve*(path : PythonPath) {.noreturn.} = 
+proc resolve*(path : NimPath) = 
     ## Sets the path to the full name of the path.
     
     path.p = expandFilename(path.p)
 
 
-proc rmdir*(path : PythonPath) {.noreturn.} = 
+proc rmdir*(path : NimPath) = 
     ## Removes the directory specified by the path. 
     
     removeDir(path.p)
 
+
+proc touch*(path : NimPath, mode: set[FilePermission] = {fpUserRead, fpUserWrite, fpGroupRead, fpGroupWrite, fpOthersRead, fpOthersWrite}, exists_ok=true) =
+    ## Create a file at the given path.
+    ## If mode is given, it is applied to the file (otherwise full read/write access is set)
+    ## If the file already exists, the function succeeds if exist_ok is true (which is the default).
+    ## In this case the file modification time will be  updated to the current time.
+    ## If the file already exists but exists_ok is set to false, an OSError exception is raised.
+
+    if path.exists():
+        if exists_ok:
+            setLastModificationTime(path.p, now().toTime())
+            return
+        else:
+            raise newException(OSError, "file '" & $path & "' already exists")
+    close(path.open(mode="wb"))
+    path.chmod(mode=mode)
+
+
+proc unlink*(path : NimPath, missing_ok=false) =
+    ## Removes the file specified by the path.
+    ## If the path points to a directory, please use Path.rmdir() instead.
+    ## If missing_ok is false (the default), a file not found OSError is raised if the path does not exist.
+    ## If missing_ok is true, missing files are ignored.
+    if not path.exists():
+        if missing_ok:
+            return
+        else:
+            # 0x2 is the File Not Found OS Error Code both on Unix and Windows
+            raiseOSError(errorCode=OSErrorCode(2), "file " & $path & " not found")
+    if path.is_dir():
+        raise newException(OSError, "folder '" & $path & "' cannot be unlinked (use rmdir instead)")
+    else:
+        removeFile(path.p)
