@@ -497,3 +497,20 @@ proc rmdir*(path : NimPath) =
     ## Removes the directory specified by the path. 
     
     removeDir(path.p)
+
+
+proc unlink*(path : NimPath, missing_ok=false) =
+    ## Removes the file specified by the path.
+    ## If the path points to a directory, please use Path.rmdir() instead.
+    ## If missing_ok is false (the default), a file not found OSError is raised if the path does not exist.
+    ## If missing_ok is true, missing files are ignored.
+    if not path.exists():
+        if missing_ok:
+            return
+        else:
+            # 0x2 is the File Not Found OS Error Code both on Unix and Windows
+            raiseOSError(errorCode=OSErrorCode(2), "file " & $path & " not found")
+    if path.is_dir():
+        raise newException(OSError, "folder '" & $path & "' cannot be unlinked (use rmdir instead)")
+    else:
+        removeFile(path.p)
