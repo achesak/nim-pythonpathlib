@@ -189,11 +189,16 @@ proc drive*(path : NimPath): string =
 
 proc root*(path : NimPath): string = 
     ## Returns a string representing the root directory, if any.
-    
-    if defined(windows):
-        return "c:"
-    else:
-        return "/"
+
+    let osRoot = if defined(windows): "\\" else: "/"
+
+    if len(path.p) >= 3:
+        if path.p[1..2] == ":/" or path.p[1..2] == ":\\":
+            return osRoot
+    if len(path.p) >= 1:
+        if path.p[0] == '/' or path.p[0] == '\\':
+            return osRoot
+    return ""
 
 
 proc parents*(path : NimPath): seq[NimPath] = 
