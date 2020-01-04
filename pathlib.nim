@@ -201,6 +201,12 @@ proc root*(path : NimPath): string =
     return ""
 
 
+proc anchor*(path : NimPath): string = 
+    ## Returns a string representing the concatenation of the drive and root, if any.
+
+    return path.drive & path.root
+
+
 proc parents*(path : NimPath): seq[NimPath] = 
     ## Returns a sequence providing access to the logical ancestors of the path.
     
