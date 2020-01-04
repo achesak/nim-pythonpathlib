@@ -1,5 +1,5 @@
 [Package]
-name = "pythonpathlib"
+name = "pathlib"
 version = "0.2"
 author = "Adam Chesak"
 description = "Module for working with paths that is as similar as possible to Python's pathlib"
