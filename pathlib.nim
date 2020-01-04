@@ -134,21 +134,6 @@ proc `!=`*(path1 : NimPath, path2 : NimPath): bool =
     return path1.p != path2.p
 
 
-proc `/`*(path1 : NimPath, path2 : string): NimPath = 
-    ## Join operator for NimPath.
-
-    let sep =
-        if '\\' in path1.p: "\\"
-        elif '/' in path1.p: "/"
-        elif '\\' in path2: "\\"
-        else: $DirSep
-
-    if path1.p.endsWith(sep):
-        path1.p = path1.p[0..high(path1.p) - 1]
-
-    return Path(path1.p & sep & path2)
-
-
 proc `/`*(path1 : NimPath, path2 : NimPath): NimPath = 
     ## Join operator for NimPath.
 
@@ -162,6 +147,12 @@ proc `/`*(path1 : NimPath, path2 : NimPath): NimPath =
         path1.p = path1.p[0..high(path1.p) - 1]
     
     return Path(path1.p & sep & path2.p)
+
+
+proc `/`*(path1 : NimPath, path2 : string): NimPath = 
+    ## Join operator for NimPath.
+
+    return path1 / Path(path2)
 
 
 proc `/`*(path1 : string, path2 : NimPath): NimPath = 
