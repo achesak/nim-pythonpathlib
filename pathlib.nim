@@ -174,10 +174,17 @@ proc parts*(path : NimPath): seq[string] =
 
 proc drive*(path : NimPath): string = 
     ## Returns a string representing the drive letter or name, if any.
-    
-    var info : FileInfo = getFileInfo(open(path.p))
-    
-    return intToStr(int(info.id.device))
+
+    if len(path.p) >= 2:
+        if path.p[1] == ':':
+            return path.p[0..1]
+        #elif len(path.p) >= 5:
+        if path.p[0..1] == "\\\\" or path.p[0..1] == "//":
+            let sep = path.p[0..0]
+            let parts = path.p[2..^1].split(sep, maxsplit=3)
+            if len(parts) >= 2:
+                return "\\\\" & parts[0..1].join("\\")
+    return ""
 
 
 proc root*(path : NimPath): string = 
