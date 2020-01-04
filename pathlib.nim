@@ -411,6 +411,12 @@ proc exists*(path : NimPath): bool =
     return existsFile(path.p) or existsDir(path.p)
 
 
+proc expanduser*(path: NimPath): NimPath =
+    ## Return a new path with expanded ~ and ~user constructs, as returned by os.expandTilde():
+
+    return Path(expandTilde(path.p))
+
+
 proc is_dir*(path : NimPath): bool = 
     ## Returns true if the path points to an existing directory, and false otherwise.
     
