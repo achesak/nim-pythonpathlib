@@ -166,18 +166,8 @@ proc `/`*(path1 : NimPath, path2 : NimPath): NimPath =
 
 proc `/`*(path1 : string, path2 : NimPath): NimPath = 
     ## Join operator for NimPath.
-    
-    let sep =
-        if '\\' in path1: "\\"
-        elif '/' in path1: "/"
-        elif '\\' in path2.p: "\\"
-        else: $DirSep
 
-    var outpath = path1
-    if outpath.endsWith(sep):
-        outpath = outpath[0..high(outpath) - 1]
-    
-    return Path(outpath & sep & path2.p)
+    return Path(path1) / path2
 
 
 proc parts*(path : NimPath): seq[string] = 
